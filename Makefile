@@ -29,10 +29,10 @@ test-image:
 	@docker build --rm --network host -t "${BUILDER}" -f build/package/Dockerfile.test .
 
 builder-image:
-	@docker build --rm --network host -t "${BUILDER}" -f build/package/Dockerfile.build .
+	@docker build --pull --no-cache --rm --network host -t "${BUILDER}" -f build/package/Dockerfile.build .
 
 binary-image: builder-image
-	@docker run --network host --rm "${BUILDER}" | docker build --network host -t "${REPOSITORY}" -f Dockerfile.run -
+	@docker run --network host --rm "${BUILDER}" | docker build --network host --pull --no-cache -t "${REPOSITORY}" -f Dockerfile.run -
 
 test:
 	"$(GOCMD)" test -timeout 1800s -v ./...
