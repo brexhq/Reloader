@@ -1,0 +1,19 @@
+FROM stakater/go-glide:1.12.6
+
+ENV KUBERNETES_SERVICE_HOST=localhost
+ENV KUBERNETES_SERVICE_PORT=8080
+
+RUN apk update
+
+RUN apk -v --update \
+    add git build-base && \
+    rm -rf /var/cache/apk/* && \
+    mkdir -p "$GOPATH/src/github.com/stakater/Reloader"
+
+ADD . "$GOPATH/src/github.com/stakater/Reloader"
+
+RUN cd "$GOPATH/src/github.com/stakater/Reloader" && \
+    glide install --strip-vendor && \
+    mkdir -p /var/run/secrets/kubernetes.io/serviceaccount && \
+    touch /var/run/secrets/kubernetes.io/serviceaccount/token && \
+    CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go test -timeout 1800s -v ./...

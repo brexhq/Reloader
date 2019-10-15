@@ -25,8 +25,11 @@ install:
 build:
 	"$(GOCMD)" build ${GOFLAGS} ${LDFLAGS} -o "${BINARY}"
 
+test-image:
+	@docker build --rm --network host -t "${BUILDER}" -f build/package/Dockerfile.test .
+
 builder-image:
-	@docker build --network host -t "${BUILDER}" -f build/package/Dockerfile.build .
+	@docker build --rm --network host -t "${BUILDER}" -f build/package/Dockerfile.build .
 
 binary-image: builder-image
 	@docker run --network host --rm "${BUILDER}" | docker build --network host -t "${REPOSITORY}" -f Dockerfile.run -
